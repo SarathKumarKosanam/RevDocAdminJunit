@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: "0 6 * * *"  # Runs every day at 6:00 UTC
   workflow_dispatch:     # Manual trigger
-  push:                  # Optional: run on every push to main
+  push:                  # Run on every push to main
     branches: [ main ]
 
 jobs:
@@ -12,8 +12,8 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout main repo
+        uses: actions/checkout@v4
 
       - name: Checkout automation repo (dependency)
         uses: actions/checkout@v4
@@ -31,7 +31,14 @@ jobs:
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@latest
 
-      - name: Install dependencies
+      # Install automation repo into local Maven cache so JUnit project can use it
+      - name: Install automation repo locally
+        run: |
+          cd automation
+          mvn clean install -DskipTests=true
+          cd ..
+
+      - name: Install dependencies for JUnit project
         run: mvn install -DskipTests=true
 
       - name: Run Selenium tests
