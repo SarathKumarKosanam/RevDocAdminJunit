@@ -16,7 +16,7 @@ jobs:
       - name: Checkout Automation repo
         uses: actions/checkout@v4
         with:
-          repository: SarathKumarKosanam/RevDocAdminAutomation
+          repository: SarathKumarKosanam/RevDocAdminJunit
           token: ${{ secrets.REPO_PAT }}
           path: automation
 
