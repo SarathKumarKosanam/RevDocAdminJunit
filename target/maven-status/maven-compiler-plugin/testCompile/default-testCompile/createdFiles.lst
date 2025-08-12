@@ -1,0 +1,8 @@
+stepDefinitions\LoginSteps.class
+stepDefinitions\LoginValidationSteps.class
+pageObjects\HomePage.class
+pageObjects\LoginPage.class
+runners\TestRunnerJUnit.class
+stepDefinitions\UploadThePDFInAddNewProcedureScreenSteps.class
+hooks\Hooks.class
+pageObjects\ProcedureConfigurationPage.class
