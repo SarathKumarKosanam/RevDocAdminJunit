@@ -2,9 +2,9 @@ name: Run Selenium Tests
 
 on:
   schedule:
-    - cron: "0 6 * * *"  # Runs every day at 6:00 UTC
-  workflow_dispatch:     # Manual trigger
-  push:                  # Run on every push to main
+    - cron: "0 6 * * *"  # Runs daily at 6:00 UTC
+  workflow_dispatch:
+  push:
     branches: [ main ]
 
 jobs:
@@ -12,34 +12,39 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout main repo
+      # 1. Checkout this repo (JUnit project)
+      - name: Checkout JUnit repo
         uses: actions/checkout@v4
 
-      - name: Checkout automation repo (dependency)
+      # 2. Checkout automation repo (dependency)
+      - name: Checkout Automation repo
         uses: actions/checkout@v4
         with:
           repository: SarathKumarKosanam/RevDocAdminJunit
           token: ${{ secrets.REPO_PAT }}
           path: automation
 
+      # 3. Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
+      # 4. Set up Chrome
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@latest
 
-      # Install automation repo into local Maven cache so JUnit project can use it
-      - name: Install automation repo locally
+      # 5. Build automation project first
+      - name: Build Automation dependency
         run: |
           cd automation
-          mvn clean install -DskipTests=true
-          cd ..
+          mvn install -DskipTests=true
 
-      - name: Install dependencies for JUnit project
+      # 6. Build JUnit project
+      - name: Build JUnit project
         run: mvn install -DskipTests=true
 
+      # 7. Run Selenium tests
       - name: Run Selenium tests
         run: mvn test -Dbrowser=headless
