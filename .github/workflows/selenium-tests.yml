@@ -1,43 +1,55 @@
 name: Run Selenium Tests
 
 on:
-  workflow_dispatch:
   schedule:
-    - cron: "0 6 * * *" # Every day at 6:00 UTC
+    - cron: "0 6 * * *"  # Runs every day at 6:00 UTC
+  workflow_dispatch:     # Manual trigger
+  push:
+    branches: [ main ]
 
 jobs:
   test:
     runs-on: ubuntu-latest
-    steps:
-      # Checkout the JUnit project
-      - name: Checkout JUnit repo
-        uses: actions/checkout@v4
 
-      # Checkout the Automation repo
+    steps:
+      # 1. Checkout Automation repo
       - name: Checkout Automation repo
+        uses: actions/checkout@v4
+        with:
+          repository: SarathKumarKosanam/RevDocAdminAutomation
+          token: ${{ secrets.REPO_PAT }}
+          path: automation
+
+      # 2. Install Automation into Maven local repo
+      - name: Install Automation dependency
+        run: mvn install -DskipTests=true
+        working-directory: automation
+
+      # 3. Checkout JUnit project
+      - name: Checkout JUnit repo
         uses: actions/checkout@v4
         with:
           repository: SarathKumarKosanam/RevDocAdminJunit
           token: ${{ secrets.REPO_PAT }}
-          path: automation
+          path: junit
 
-      # Set up Java
+      # 4. Set up JDK 17
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
           distribution: 'temurin'
           java-version: '17'
 
-      # Install Automation dependency into Maven local repo
-      - name: Build Automation dependency
-        run: |
-          cd automation
-          mvn install -DskipTests=true
+      # 5. Set up Chrome
+      - name: Set up Chrome
+        uses: browser-actions/setup-chrome@latest
 
-      # Build JUnit project (now dependency will be found)
-      - name: Build JUnit
+      # 6. Build JUnit project
+      - name: Build JUnit project
         run: mvn install -DskipTests=true
+        working-directory: junit
 
-      # Run Selenium tests
+      # 7. Run Selenium tests
       - name: Run Selenium tests
         run: mvn test -Dbrowser=headless
+        working-directory: junit
