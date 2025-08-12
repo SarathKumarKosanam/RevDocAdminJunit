@@ -36,4 +36,11 @@ jobs:
 
       - name: Build main project & run tests
         run: |
+		
           mvn -B -f pom.xml clean test -Dbrowser=headless
+		  - name: Checkout automation repo (dependency)
+		    uses: actions/checkout@v4
+		    with:
+		      repository: <OWNER>/<RevDocAdminAutomation>
+		      token: ${{ secrets.REPO_PAT }}   # must match the secret name
+		      path: automation
