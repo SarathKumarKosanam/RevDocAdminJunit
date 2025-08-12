@@ -4,7 +4,7 @@ on:
   schedule:
     - cron: "0 6 * * *"  # Runs every day at 6:00 UTC
   workflow_dispatch:     # Manual trigger
-  push:                  # Optional: run on every push to main
+  push:                  # Run on every push to main
     branches: [ main ]
 
 jobs:
@@ -20,13 +20,13 @@ jobs:
         with:
           distribution: 'temurin'
           java-version: '17'
+          cache: maven   # <— speeds up dependency downloads
 
       - name: Set up Chrome
         uses: browser-actions/setup-chrome@latest
 
-      - name: Install dependencies
-        run: mvn install -DskipTests=true
+      - name: Build project & download dependencies
+        run: mvn clean install -DskipTests
 
       - name: Run Selenium tests
-        run: |
-          mvn test -Dbrowser=headless
+        run: mvn test -Dbrowser=headless
