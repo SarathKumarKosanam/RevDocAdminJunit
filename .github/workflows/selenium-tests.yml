@@ -11,36 +11,44 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      - name: Checkout Repository
+        uses: actions/checkout@v4
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v3
+        uses: actions/setup-java@v4
         with:
           java-version: '17'
           distribution: 'temurin'
-          cache: maven
+
+      - name: Cache Maven packages
+        uses: actions/cache@v4
+        with:
+          path: ~/.m2
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
 
       - name: Build with Maven
-        run: mvn clean install -Dmaven.test.failure.ignore=true
+        run: mvn clean install -DskipTests
 
-      - name: Run Tests with Maven
+      - name: Run Tests
         run: mvn test
 
       - name: Upload Cucumber Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: cucumber-reports
-          path: RevDocAdminJUnit/target/cucumber-reports/**
+          path: RevDocAdminJunit/target/cucumber-reports/
 
       - name: Upload Extent Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: extent-reports
-          path: RevDocAdminJUnit/target/ExtentReports/**
+          path: RevDocAdminJunit/target/ExtentReports/
 
       - name: Upload Screenshots
-        uses: actions/upload-artifact@v3
+        if: always()
+        uses: actions/upload-artifact@v4
         with:
           name: screenshots
-          path: RevDocAdminJUnit/target/screenshots/**
+          path: RevDocAdminJunit/target/screenshots/
