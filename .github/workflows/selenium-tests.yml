@@ -12,34 +12,35 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v3
 
       - name: Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v3
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: maven
 
-      - name: Build with Maven & Run Tests
-        run: mvn clean test
+      - name: Build with Maven
+        run: mvn clean install -Dmaven.test.failure.ignore=true
 
-      - name: List target folder (debugging)
-        run: ls -R target || true
+      - name: Run Tests with Maven
+        run: mvn test
 
       - name: Upload Cucumber Reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: cucumber-reports
-          path: target/cucumber-reports/**
+          path: RevDocAdminJUnit/target/cucumber-reports/**
 
       - name: Upload Extent Reports
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: extent-reports
-          path: target/ExtentReports/**
+          path: RevDocAdminJUnit/target/ExtentReports/**
 
       - name: Upload Screenshots
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v3
         with:
           name: screenshots
-          path: target/screenshots/**
+          path: RevDocAdminJUnit/target/screenshots/**
