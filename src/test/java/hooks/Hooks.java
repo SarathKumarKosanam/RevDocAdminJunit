@@ -19,7 +19,7 @@ public class Hooks {
     @Before
     public void setUp(Scenario scenario) {
         // Initialize driver and store in DriverManager
-        driver = DriverFactory.initializeDriver();
+    	DriverFactory.getDriver();
         DriverManager.setDriver(driver);
 
         // Navigate to base URL
