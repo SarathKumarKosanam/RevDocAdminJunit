@@ -2,24 +2,20 @@ package utils;
 
 import com.aventstack.extentreports.ExtentTest;
 
-import java.util.HashMap;
-import java.util.Map;
-
 public class ExtentTestManager {
-    private static Map<Integer, ExtentTest> extentTestMap = new HashMap<>();
-    private static ExtentTest test;
+    private static ThreadLocal<ExtentTest> extentTest = new ThreadLocal<>();
+
+    public static synchronized ExtentTest startTest(String testName) {
+        ExtentTest test = ExtentManager.getExtentReports().createTest(testName);
+        extentTest.set(test);
+        return test;
+    }
 
     public static synchronized ExtentTest getTest() {
-        return extentTestMap.get((int) Thread.currentThread().getId());
+        return extentTest.get();
     }
 
     public static synchronized void endTest() {
-        ExtentManager.getInstance().flush();
-    }
-
-    public static synchronized ExtentTest startTest(String testName) {
-        test = ExtentManager.getInstance().createTest(testName);
-        extentTestMap.put((int) Thread.currentThread().getId(), test);
-        return test;
+        extentTest.remove(); // remove from ThreadLocal
     }
 }

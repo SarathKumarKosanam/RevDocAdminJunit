@@ -1,5 +1,7 @@
 Feature: Login feature
 
+ @RunThisScenario
+
   Scenario: Valid login
     Given I launch the login page
     When I login with username "rushendra@quadricit.com" password "Rushidoddoji1!" and OTP "123456"

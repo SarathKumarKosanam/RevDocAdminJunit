@@ -1,55 +1,39 @@
-name: Run Selenium Tests
+name: Run Selenium-Cucumber-JUnit Tests
 
 on:
-  schedule:
-    - cron: "0 6 * * *"  # Runs every day at 6:00 UTC
-  workflow_dispatch:     # Manual trigger
   push:
-    branches: [ main ]
+    branches:
+      - main      # runs when you push to main
+  workflow_dispatch:  # allows manual trigger
+  schedule:
+    - cron: '0 2 * * *' # runs daily at 2 AM UTC
 
 jobs:
-  test:
+  build:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout Automation repo
-      - name: Checkout Automation repo
-        uses: actions/checkout@v4
-        with:
-          repository: SarathKumarKosanam/RevDocAdminJunit
-          token: ${{ secrets.REPO_PAT }}
-          path: automation
+      - name: Checkout repository
+        uses: actions/checkout@v3
 
-      # 2. Install Automation into Maven local repo
-      - name: Install Automation dependency
-        run: mvn install -DskipTests=true
-        working-directory: automation
-
-      # 3. Checkout JUnit project
-      - name: Checkout JUnit repo
-        uses: actions/checkout@v4
-        with:
-          repository: SarathKumarKosanam/RevDocAdminJunit
-          token: ${{ secrets.REPO_PAT }}
-          path: junit
-
-      # 4. Set up JDK 17
-      - name: Set up JDK 17
+      - name: Set up JDK
         uses: actions/setup-java@v3
         with:
-          distribution: 'temurin'
-          java-version: '17'
+          java-version: '17'  # your Java version
 
-      # 5. Set up Chrome
       - name: Set up Chrome
-        uses: browser-actions/setup-chrome@latest
+        uses: browser-actions/setup-chrome@v1
 
-      # 6. Build JUnit project
-      - name: Build JUnit project
-        run: mvn install -DskipTests=true
-        working-directory: junit
+      - name: Set up Edge
+        uses: browser-actions/setup-edge@v1
 
-      # 7. Run Selenium tests
-      - name: Run Selenium tests
-        run: mvn test -Dbrowser=headless
-        working-directory: junit
+      - name: Cache Maven
+        uses: actions/cache@v3
+        with:
+          path: ~/.m2/repository
+          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
+          restore-keys: |
+            ${{ runner.os }}-maven-
+
+      - name: Build & run tests
+        run: mvn clean test

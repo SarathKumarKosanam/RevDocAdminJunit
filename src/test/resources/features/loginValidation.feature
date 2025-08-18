@@ -1,8 +1,8 @@
 Feature: Login field validations
 
-@EmailValidationTest
+
   Scenario: Validate email and password fields with and without input
-    Given I launching the login page
+    Given I open the login screen for validation
     When I click login without entering any fields
     Then I should see "This field is required" message under email and password
     When I enter invalid email "test@invalid.c" and click login

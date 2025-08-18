@@ -1,47 +1,67 @@
 package hooks;
 
-import io.cucumber.java.After;
-import io.cucumber.java.Before;
-import io.cucumber.java.Scenario;
-import org.openqa.selenium.WebDriver;
+import io.cucumber.java.*;
+import org.openqa.selenium.*;
+import utils.ConfigReader;
 import utils.DriverFactory;
-import utils.ExtentTestManager;
+import utils.DriverManager;
+import utils.ExtentManager;
 import utils.ScreenshotUtil;
-import com.aventstack.extentreports.Status;
+import com.aventstack.extentreports.ExtentTest;
 
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.util.Base64;
 
 public class Hooks {
-    WebDriver driver;
+
+    private WebDriver driver;
+    private static ExtentTest currentTest;
 
     @Before
     public void setUp(Scenario scenario) {
-        System.out.println("🔧 Starting Scenario: " + scenario.getName());
-        ExtentTestManager.startTest(scenario.getName());
+        // Initialize driver and store in DriverManager
+        driver = DriverFactory.initializeDriver();
+        DriverManager.setDriver(driver);
+
+        // Navigate to base URL
+        String baseUrl = ConfigReader.getProperty("baseUrl");
+        if (baseUrl != null && !baseUrl.isEmpty()) {
+            driver.get(baseUrl);
+        } else {
+            throw new RuntimeException("Base URL is not set in config.properties!");
+        }
+
+        // Start a new Extent test for this scenario
+        currentTest = ExtentManager.getExtentReports().createTest(scenario.getName() + " " + scenario.getSourceTagNames());
     }
 
     @After
     public void tearDown(Scenario scenario) {
-        driver = DriverFactory.getDriver();
+        try {
+            if (scenario.isFailed()) {
+                // Capture screenshot once
+                byte[] screenshotBytes = ((TakesScreenshot) driver).getScreenshotAs(OutputType.BYTES);
+                String screenshotBase64 = Base64.getEncoder().encodeToString(screenshotBytes);
 
-        if (scenario.isFailed()) {
-            ExtentTestManager.getTest().log(Status.FAIL, "❌ Test Failed: " + scenario.getName());
+                // Attach to Cucumber report
+                scenario.attach(screenshotBytes, "image/png", "Failed Step Screenshot");
 
-            String screenshotPath = ScreenshotUtil.takeScreenshot(driver, scenario.getName());
-            try {
-                byte[] screenshotBytes = Files.readAllBytes(Paths.get(screenshotPath));
-                scenario.attach(screenshotBytes, "image/png", scenario.getName());
-
-                ExtentTestManager.getTest().addScreenCaptureFromPath(screenshotPath);
-            } catch (Exception e) {
-                e.printStackTrace();
+                // Attach to Extent report
+                currentTest.fail("Scenario failed: " + scenario.getName())
+                        .addScreenCaptureFromBase64String(screenshotBase64);
+            } else {
+                currentTest.pass("Scenario passed successfully");
             }
-        } else {
-            ExtentTestManager.getTest().log(Status.PASS, "✅ Test Passed: " + scenario.getName());
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            // Quit driver after each scenario
+            DriverFactory.quitDriver();
         }
+    }
 
-        ExtentTestManager.endTest();
-        DriverFactory.quitDriver();
+    // Flush Extent report once after all scenarios
+    @AfterAll
+    public static void afterAll() {
+        ExtentManager.getExtentReports().flush();
     }
 }

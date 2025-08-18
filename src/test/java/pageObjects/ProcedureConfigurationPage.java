@@ -1,13 +1,10 @@
 package pageObjects;
 
+import java.nio.file.Paths;
 import java.time.Duration;
-import org.openqa.selenium.By;
-import org.openqa.selenium.WebDriver;
-import org.openqa.selenium.WebElement;
-import org.openqa.selenium.support.FindBy;
-import org.openqa.selenium.support.PageFactory;
-import org.openqa.selenium.support.ui.ExpectedConditions;
-import org.openqa.selenium.support.ui.WebDriverWait;
+import org.openqa.selenium.*;
+import org.openqa.selenium.support.*;
+import org.openqa.selenium.support.ui.*;
 
 public class ProcedureConfigurationPage {
 
@@ -16,37 +13,29 @@ public class ProcedureConfigurationPage {
 
     public ProcedureConfigurationPage(WebDriver driver) {
         this.driver = driver;
-        this.wait = new WebDriverWait(driver, Duration.ofSeconds(10)); // 10 sec wait
+        this.wait = new WebDriverWait(driver, Duration.ofSeconds(15));
         PageFactory.initElements(driver, this);
     }
 
-    @FindBy(xpath = "//button[span[text()='+ Add New Procedure']]") 
-    WebElement AddNewProcedureButton;
+    @FindBy(xpath = "//button[span[text()='+ Add New Procedure']]")
+    WebElement addNewProcedureButton;
 
-    @FindBy(xpath = "//input[@id = \"procedurePdf\"]") 
-    WebElement UploadPDFButton;
+    @FindBy(id = "procedurePdf")
+    WebElement uploadPDFInput;
 
-    /**
-     * Clicks on Add New Procedure Button with wait
-     */
-    public void clickingOnAddNewProcedrueButton() {
-        wait.until(ExpectedConditions.elementToBeClickable(AddNewProcedureButton)).click();
+    public void clickAddNewProcedureButton() {
+        wait.until(ExpectedConditions.elementToBeClickable(addNewProcedureButton)).click();
     }
 
-    /**
-     * Uploads PDF file using sendKeys
-     */
-    public void clickingOnUploadPDFButton() {
+    public void uploadPDF(String relativePath) {
+        String absolutePath = Paths.get(relativePath).toAbsolutePath().toString();
         wait.until(ExpectedConditions.presenceOfElementLocated(By.id("procedurePdf")));
-        UploadPDFButton.sendKeys("C:\\Users\\LENOVO\\Desktop\\Eclipse\\Input Test Files\\Test PDF file.pdf");
+        uploadPDFInput.sendKeys(absolutePath);
     }
 
-    /**
-     * Checks if PDF was uploaded successfully
-     */
     public boolean isPDFUploadedSuccessfully() {
         WebElement uploadedPDF = wait.until(ExpectedConditions.visibilityOfElementLocated(
-            By.xpath("//span[text() = \" File selected\"]")
+            By.xpath("//span[text()=' File selected']")
         ));
         return uploadedPDF.isDisplayed();
     }

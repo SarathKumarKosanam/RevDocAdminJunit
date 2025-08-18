@@ -1,0 +1,9 @@
+<extentreports>
+    <configuration>
+        <theme>standard</theme>
+        <encoding>utf-8</encoding>
+        <protocol>https</protocol>
+        <documentTitle>RevDocJUnit5 Test Report</documentTitle>
+        <reportName>RevDoc JUnit5 Suite</reportName>
+    </configuration>
+</extentreports>

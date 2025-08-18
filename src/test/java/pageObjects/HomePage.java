@@ -29,8 +29,8 @@ public class HomePage {
     @FindBy(xpath = "//img[contains(@src, 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAACsAAAAr')]")
     WebElement GroupMembershipIcon;
 
-    @FindBy(xpath = "//button//div[text()= '+ Add New']")
-    WebElement AddNewButton;
+    @FindBy(xpath = "//button//span[text()= '+ Add New Procedure']")
+    WebElement AddNewProcedure;
 
     public void clickingOnProcedureManagementIcon() {
         wait.waitForClickability(ProcedureManagementIcon, 10).click();
@@ -41,11 +41,11 @@ public class HomePage {
     }
 
     public void clickingOnGroupMembership() {
-        wait.waitForClickability(GroupMembershipIcon, 10).click();
+        wait.waitForClickability(ProcedureManagementIcon, 10).click();
     }
 
     public void clickingOnAddNewButton() {
-        wait.waitForClickability(AddNewButton, 10).click();
+        wait.waitForClickability(AddNewProcedure, 10).click();
     }
 
     public String homePageLoading() {

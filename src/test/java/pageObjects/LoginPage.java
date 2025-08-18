@@ -47,15 +47,28 @@ public class LoginPage {
     // ------------------ Actions ------------------
 
     public void login(String uname, String pwd, String otp) {
+    	
+    	
         wait.waitForVisibility(username, 10).sendKeys(uname);
         wait.waitForVisibility(password, 10).sendKeys(pwd);
-
+        
+      
         wait.waitForClickability(loginButton, 10).click();
 
         // Wait until OTP field is visible
         wait.waitForVisibility(OTPField, 10).sendKeys(otp);
 
+        try {
+     	   Thread.sleep(2000);
+        }
+        catch(Exception e) {}
+        
         wait.waitForClickability(verifyOTPButton, 10).click();
+        try {
+      	   Thread.sleep(2000);
+         }
+         catch(Exception e) {}
+         
     }
 
     public void clickLogin() {
