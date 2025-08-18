@@ -1,4 +1,4 @@
-name: RevDocAdmin JUnit CI
+name: RevDoc Admin JUnit CI
 
 on:
   push:
@@ -11,7 +11,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Checkout Code
+      - name: Checkout repository
         uses: actions/checkout@v4
 
       - name: Set up JDK 17
@@ -19,16 +19,22 @@ jobs:
         with:
           java-version: '17'
           distribution: 'temurin'
+          cache: maven
 
-      - name: Build and Run Tests
-        run: mvn clean test
+      - name: Build with Maven
+        run: mvn clean install -B
 
-      - name: Upload Test Reports
+      - name: Run Cucumber Tests
+        run: mvn test
+
+      - name: Debug - List target files
+        run: ls -R target
+
+      - name: Upload test reports
         uses: actions/upload-artifact@v4
         with:
-          name: Test-Reports
+          name: test-reports
           path: |
             target/cucumber-reports/**
-            target/cucumber-html-reports/**
             target/ExtentReports/**
             target/screenshots/**
