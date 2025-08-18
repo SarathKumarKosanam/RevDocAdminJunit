@@ -1,40 +1,16 @@
-# Maven target directory
-target/
+# Maven target folder
+/target/
 
-# Maven build logs
-*.log
-
-# IntelliJ IDEA
+# IntelliJ/Eclipse/IDE specific files
 .idea/
 *.iml
-out/
-
-# Eclipse
 .project
 .classpath
 .settings/
 
-# NetBeans
-nbproject/
-build/
-nbbuild/
-dist/
-nbdist/
-.nb-gradle/
+# Logs
+*.log
 
-# VS Code
-.vscode/
-
-# OS generated files
+# OS files
 .DS_Store
 Thumbs.db
-
-# Selenium-related
-selenium-screenshots/
-test-output/
-reports/
-
-# Temporary files
-*.tmp
-*.swp
-*.swo
