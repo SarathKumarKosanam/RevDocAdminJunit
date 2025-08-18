@@ -1,30 +1,29 @@
-# File: .github/workflows/run-tests.yml
-name: Run RevDoc Admin JUnit Tests
+name: Run RevDoc Admin JUnit5 Tests
 
-# Trigger: manual and daily
+# Triggers
 on:
-  workflow_dispatch:       # allows manual trigger
-  schedule:
-    - cron: "0 1 * * *"   # daily at 01:00 UTC (adjust if needed)
+  workflow_dispatch:  # manual trigger
+  schedule:          # daily run at 6 AM UTC
+    - cron: "0 6 * * *"
 
 jobs:
-  build-and-test:
+  run-tests:
     runs-on: ubuntu-latest
 
     steps:
-      # 1. Checkout the code
-      - name: Checkout repository
-        uses: actions/checkout@v3
+      # 1. Checkout repository
+      - name: Checkout repo
+        uses: actions/checkout@v4
 
-      # 2. Set up Java
+      # 2. Set up Java (JDK 17)
       - name: Set up JDK 17
         uses: actions/setup-java@v3
         with:
-          java-version: 17
           distribution: temurin
+          java-version: 17
 
       # 3. Cache Maven dependencies
-      - name: Cache Maven packages
+      - name: Cache Maven dependencies
         uses: actions/cache@v3
         with:
           path: ~/.m2/repository
@@ -32,17 +31,13 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-maven-
 
-      # 4. Build project
-      - name: Build with Maven
-        run: mvn clean install -B
+      # 4. Build and run tests
+      - name: Build & run tests
+        run: mvn clean test
 
-      # 5. Run tests
-      - name: Run tests
-        run: mvn test -B
-
-      # 6. Upload reports as artifacts
+      # 5. Upload Cucumber and Extent reports
       - name: Upload Test Reports
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: test-reports
           path: |
