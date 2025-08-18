@@ -5,6 +5,9 @@ on:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
+  workflow_dispatch:
+  schedule:
+    - cron: "0 6 * * *"   # run daily at 6 AM UTC
 
 jobs:
   build:
@@ -34,21 +37,24 @@ jobs:
       - name: Run Tests
         run: mvn test
 
+      - name: List target contents (debugging)
+        run: ls -R target || echo "No target directory found"
+
       - name: Upload Cucumber Reports
         uses: actions/upload-artifact@v4
         with:
           name: cucumber-reports
-          path: RevDocAdminJunit/target/cucumber-reports/
+          path: target/cucumber-reports/**
 
       - name: Upload Extent Reports
         uses: actions/upload-artifact@v4
         with:
           name: extent-reports
-          path: RevDocAdminJunit/target/ExtentReports/
+          path: target/ExtentReports/**
 
       - name: Upload Screenshots
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: screenshots
-          path: RevDocAdminJunit/target/screenshots/
+          path: target/screenshots/**
