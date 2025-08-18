@@ -2,10 +2,9 @@ name: RevDocAdminJUnit CI
 
 on:
   push:
-    branches:
-      - main
-      - master
+    branches: [ "main" ]
   pull_request:
+    branches: [ "main" ]
 
 jobs:
   build:
@@ -18,31 +17,29 @@ jobs:
       - name: Set up JDK 17
         uses: actions/setup-java@v4
         with:
-          distribution: 'temurin'
           java-version: '17'
+          distribution: 'temurin'
 
-      - name: Cache Maven packages
-        uses: actions/cache@v3
-        with:
-          path: ~/.m2/repository
-          key: ${{ runner.os }}-maven-${{ hashFiles('**/pom.xml') }}
-          restore-keys: |
-            ${{ runner.os }}-maven-
+      - name: Build with Maven & Run Tests
+        run: mvn clean test
 
-      - name: Build with Maven
-        run: mvn -B clean install
-
-      - name: Run JUnit Tests
-        run: mvn test
-
-      - name: List target folder contents
+      - name: List target folder (debugging)
         run: ls -R target || true
 
-      - name: Upload test reports
+      - name: Upload Cucumber Reports
         uses: actions/upload-artifact@v4
         with:
-          name: test-reports
-          path: |
-            target/cucumber-reports/**
-            target/ExtentReports/**
-            target/screenshots/**
+          name: cucumber-reports
+          path: target/cucumber-reports/**
+
+      - name: Upload Extent Reports
+        uses: actions/upload-artifact@v4
+        with:
+          name: extent-reports
+          path: target/ExtentReports/**
+
+      - name: Upload Screenshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: screenshots
+          path: target/screenshots/**
